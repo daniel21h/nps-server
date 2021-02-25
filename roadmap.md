@@ -1,0 +1,3 @@
+# In Jest
+
+- integration tests
