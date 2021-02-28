@@ -2,6 +2,7 @@ import request from 'supertest';
 import { server } from '../server';
 
 import createConnection from '../database';
+import { getConnection } from 'typeorm';
 
 describe('Users', () => {
   beforeAll(async() => {
@@ -9,6 +10,14 @@ describe('Users', () => {
 
     await connection.runMigrations();
   });
+
+  // DropDatabase
+  afterAll(async () => {
+    const connection = getConnection()
+
+    await connection.dropDatabase()
+    await connection.close()
+  })
 
   it('should be able to create a new user', async () => {
     const response = await request(server).post('/users').send({
