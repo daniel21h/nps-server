@@ -1,8 +1,11 @@
 import 'reflect-metadata';
 
-import express from 'express';
+import express, { Request, Response, NextFunction } from 'express';
+import 'express-async-errors';
+
 import createConnection from './database';
 import { routes } from './routes';
+import { AppError } from './errors/AppError';
 
 createConnection();
 
@@ -11,5 +14,17 @@ const server = express();
 server.use(express.json())
 server.use(routes);
 
+server.use((err: Error, request: Request, response: Response, _next: NextFunction) => {
+  if (err instanceof AppError) {
+    return response.status(err.statusCode).json({
+      message: err.message
+    })
+  }
+
+  return response.status(500).json({
+    status: 'Error',
+    message: `Internal server error ${err.message}`
+  })
+})
 
 export { server };
